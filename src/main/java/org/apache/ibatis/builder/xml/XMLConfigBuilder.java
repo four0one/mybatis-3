@@ -84,10 +84,10 @@ public class XMLConfigBuilder extends BaseBuilder {
 
   private XMLConfigBuilder(XPathParser parser, String environment, Properties props) {
     super(new Configuration());
-    ErrorContext.instance().resource("SQL Mapper Configuration");
-    this.configuration.setVariables(props);
+    ErrorContext.instance().resource("SQL Mapper Configuration");//基于当前线程的单例ErrorContext.instance()
+    this.configuration.setVariables(props);//default null
     this.parsed = false;
-    this.environment = environment;
+    this.environment = environment;//default null
     this.parser = parser;
   }
 
@@ -105,7 +105,7 @@ public class XMLConfigBuilder extends BaseBuilder {
       //issue #117 read properties first
       propertiesElement(root.evalNode("properties"));
       Properties settings = settingsAsProperties(root.evalNode("settings"));
-      loadCustomVfs(settings);
+      loadCustomVfs(settings);//一般setting不会配置VFS 因此这部分可忽略
       typeAliasesElement(root.evalNode("typeAliases"));
       pluginElement(root.evalNode("plugins"));
       objectFactoryElement(root.evalNode("objectFactory"));
@@ -151,6 +151,10 @@ public class XMLConfigBuilder extends BaseBuilder {
     }
   }
 
+  /**
+   * 别名映射 package包映射或者多个类映射
+   * @param parent
+   */
   private void typeAliasesElement(XNode parent) {
     if (parent != null) {
       for (XNode child : parent.getChildren()) {
@@ -236,8 +240,11 @@ public class XMLConfigBuilder extends BaseBuilder {
   }
 
   private void settingsElement(Properties props) throws Exception {
+	 // 指定MyBatis如何自动映射列到字段/属性
     configuration.setAutoMappingBehavior(AutoMappingBehavior.valueOf(props.getProperty("autoMappingBehavior", "PARTIAL")));
+    //当检测出未知列（或未知属性）时，如何处理，默认情况下没有任何提示
     configuration.setAutoMappingUnknownColumnBehavior(AutoMappingUnknownColumnBehavior.valueOf(props.getProperty("autoMappingUnknownColumnBehavior", "NONE")));
+    //这个配置使全局的映射器启用或禁用缓存
     configuration.setCacheEnabled(booleanValueOf(props.getProperty("cacheEnabled"), true));
     configuration.setProxyFactory((ProxyFactory) createInstance(props.getProperty("proxyFactory")));
     configuration.setLazyLoadingEnabled(booleanValueOf(props.getProperty("lazyLoadingEnabled"), false));
@@ -268,6 +275,12 @@ public class XMLConfigBuilder extends BaseBuilder {
     configuration.setConfigurationFactory(resolveClass(props.getProperty("configurationFactory")));
   }
 
+	/**
+	 * 加载env配置 默认使用配置default
+	 * 一般用来配置不同环境数据源和事务用
+	 * @param context
+	 * @throws Exception
+	 */
   private void environmentsElement(XNode context) throws Exception {
     if (context != null) {
       if (environment == null) {

@@ -303,4 +303,11 @@ public class SQLTest {
     final SQL sql = new SQL().UPDATE("table1 a").INNER_JOIN("table2 b USING (ID)").SET("a.value = b.value");
     assertThat(sql.toString()).isEqualTo("UPDATE table1 a\nINNER JOIN table2 b USING (ID)\nSET a.value = b.value");
   }
+
+  @Test
+  public void select(){
+    SQL selectSql = new SQL();
+    selectSql.SELECT("*").FROM("t_animal").WHERE("name='hema'").AND().WHERE("age=12");
+    System.out.println(selectSql.toString());
+  }
 }

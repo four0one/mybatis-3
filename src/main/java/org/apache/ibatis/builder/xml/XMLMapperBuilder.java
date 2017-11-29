@@ -88,11 +88,14 @@ public class XMLMapperBuilder extends BaseBuilder {
   }
 
   public void parse() {
+    //判断mapper是否已经被加载
     if (!configuration.isResourceLoaded(resource)) {
       configurationElement(parser.evalNode("/mapper"));
       configuration.addLoadedResource(resource);
       bindMapperForNamespace();
-    }
+    }else{
+    	throw new BuilderException("这个mapper已经被加载");
+	}
 
     parsePendingResultMaps();
     parsePendingCacheRefs();
@@ -184,11 +187,17 @@ public class XMLMapperBuilder extends BaseBuilder {
     }
   }
 
+	/**
+	 * 缓存引用配置
+	 * 用于Amapper使用Bmapper缓存配置
+	 * @param context
+	 */
   private void cacheRefElement(XNode context) {
     if (context != null) {
       configuration.addCacheRef(builderAssistant.getCurrentNamespace(), context.getStringAttribute("namespace"));
       CacheRefResolver cacheRefResolver = new CacheRefResolver(builderAssistant, context.getStringAttribute("namespace"));
       try {
+      	//builderAssistant.useCacheRef
         cacheRefResolver.resolveCacheRef();
       } catch (IncompleteElementException e) {
         configuration.addIncompleteCacheRef(cacheRefResolver);

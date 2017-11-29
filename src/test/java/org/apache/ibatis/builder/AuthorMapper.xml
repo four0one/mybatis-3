@@ -22,8 +22,9 @@
 
 <mapper namespace="org.apache.ibatis.domain.blog.mappers.AuthorMapper">
 
+    <cache/>
 	<parameterMap id="selectAuthor" type="org.apache.ibatis.domain.blog.Author">
-		<parameter property="id" />
+		<parameter property="id"/>
 	</parameterMap>
 
 	<resultMap id="selectAuthor" type="org.apache.ibatis.domain.blog.Author">

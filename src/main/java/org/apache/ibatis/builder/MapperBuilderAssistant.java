@@ -149,6 +149,18 @@ public class MapperBuilderAssistant extends BaseBuilder {
     return parameterMap;
   }
 
+  /**
+   *
+   * @param parameterType
+   * @param property
+   * @param javaType
+   * @param jdbcType
+   * @param resultMap
+   * @param parameterMode
+   * @param typeHandler
+   * @param numericScale
+   * @return
+   */
   public ParameterMapping buildParameterMapping(
       Class<?> parameterType,
       String property,

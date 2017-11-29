@@ -138,6 +138,10 @@ public class TypeAliasRegistry {
     }
   }
 
+	/**
+	 * 获取类名作为别名
+	 * @param type
+	 */
   public void registerAlias(Class<?> type) {
     String alias = type.getSimpleName();
     Alias aliasAnnotation = type.getAnnotation(Alias.class);
@@ -153,6 +157,13 @@ public class TypeAliasRegistry {
     }
     // issue #748
     String key = alias.toLowerCase(Locale.ENGLISH);
+
+	  /**
+	   * !TYPE_ALIASES.get(key).equals(value)这里的判断不会true，就算类型相同也被！处理为false.
+	   * 猜测这个判断的目的是由map覆盖之前的kv， 不让程序出错，但是会带来别名错误排查困难.
+	   * 可以将条件改为TYPE_ALIASES.containsKey(key) && TYPE_ALIASES.get(key) != null && TYPE_ALIASES.get(key).equals(value)
+	   * 一旦重复配置相同的别名报错
+	   */
     if (TYPE_ALIASES.containsKey(key) && TYPE_ALIASES.get(key) != null && !TYPE_ALIASES.get(key).equals(value)) {
       throw new TypeException("The alias '" + alias + "' is already mapped to the value '" + TYPE_ALIASES.get(key).getName() + "'.");
     }
